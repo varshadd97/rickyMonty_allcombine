@@ -1,5 +1,6 @@
+import { FETCH_DATA_REQUEST } from "../constant";
 
-export const fetchUserAsync = (action: number) => ({
-  type: "FETCH_DATA_REQUEST",
+export const fetchData = (action: number) => ({
+  type: FETCH_DATA_REQUEST,
   payload: action,
 });

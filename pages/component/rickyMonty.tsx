@@ -2,25 +2,18 @@ import Image from "next/image";
 
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { useDispatch } from "react-redux";
-import { fetchUserAsync } from "../store/Action/characterAction";
+import { fetchData } from "../store/Action/characterAction";
 import { fetchEpisode } from "../store/Action/episodeAction";
-
-type actionProps = {
-  type: string;
-  payload: number;
-};
-type props = {
-  data: null | undefined | string;
-  loading: boolean;
-  error: string;
-  fetchData: actionProps;
-  fetchEpisode: actionProps;
-};
+import {
+  props,
+  charApiProps,
+  episodeResponseProps,
+  reducerProps,
+} from "../store/types";
 
 function rickyMonty({ data, loading, error, fetchData, fetchEpisode }: props) {
-  const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   useEffect(() => {
     fetchData(currentPage);
@@ -65,15 +58,12 @@ function rickyMonty({ data, loading, error, fetchData, fetchEpisode }: props) {
           onChange={(e) => setSearch(e.target.value)}
         />
       </div>
-      <br />
-      <br />
-      <br />
-      <br />
-      <div className="grid-container container ">
+
+      <div className="grid-container container mt-5 ">
         {data &&
           data?.user?.data[1]
             ?.slice(0, 6)
-            ?.filter((val: any) => {
+            ?.filter((val: charApiProps | any) => {
               if (val == "") {
                 return val;
               } else if (
@@ -82,9 +72,9 @@ function rickyMonty({ data, loading, error, fetchData, fetchEpisode }: props) {
                 return val;
               }
             })
-            .map((item: any, index: any) => {
+            .map((item: charApiProps) => {
               return (
-                <div className="card">
+                <div className="card" key={item.id}>
                   <div className="d-flex justify-content-start bg-secondary bg-gradient text-white check">
                     <div>
                       <Image
@@ -92,6 +82,7 @@ function rickyMonty({ data, loading, error, fetchData, fetchEpisode }: props) {
                         alt="rickymonty"
                         width={200}
                         height={200}
+                        priority={true}
                       />
                     </div>
                     <div className="ps-3 pt-3 ">
@@ -129,8 +120,8 @@ function rickyMonty({ data, loading, error, fetchData, fetchEpisode }: props) {
                         {data &&
                           data?.episode?.data[1]
                             ?.slice(0, 1)
-                            ?.map((itm: any) => {
-                              return <span>{itm?.name}</span>;
+                            ?.map((itm: episodeResponseProps) => {
+                              return <span key={itm.id}>{itm?.name}</span>;
                             })}
                       </div>
                     </div>
@@ -139,7 +130,15 @@ function rickyMonty({ data, loading, error, fetchData, fetchEpisode }: props) {
               );
             })}
       </div>
-      <div className="mx-auto mt-4" style={{ width: "200px" }}>
+      <div className="d-flex justify-content-center check">
+        {error === undefined ? <div>Error Fetchning users</div> : null}
+      </div>
+
+      <div className="d-flex justify-content-center check">
+        {error === undefined ? <div>Error Fetchning episode</div> : null}
+      </div>
+
+      <div className="mx-auto mt-4 " style={{ width: "200px" }}>
         <button onClick={handleClickPrevious} className="m-4 bg-light p-2">
           Previous
         </button>
@@ -152,16 +151,16 @@ function rickyMonty({ data, loading, error, fetchData, fetchEpisode }: props) {
   );
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: reducerProps | any) => {
   return {
     data: state,
-    loading: state.loading,
-    error: state.error,
+    loading: state?.loading,
+    error: state?.error,
   };
 };
 
 const mapDispatchToProps = {
-  fetchData: fetchUserAsync,
+  fetchData,
   fetchEpisode,
 };
 
